@@ -1,12 +1,12 @@
 # rules
 --disable strongifiedSelf,preferKeyPath,braces, extensionAccessControl,organizeDeclarations,numberFormatting
---disable redundantBackticks, blankLinesAtStartOfScope,blankLinesAtEndOfScope, elseOnSameLine, strongOutlets, wrapSwitchCases, wrapAttributes
+--disable markTypes, redundantBackticks, blankLinesAtStartOfScope,blankLinesAtEndOfScope, elseOnSameLine, strongOutlets, wrapSwitchCases, wrapAttributes
 --disable unusedArguments # Not working great with SwiftyMocky
 --enable isEmpty,andOperator,anyObjectProtocol,blankLinesAroundMark
 --enable blankLinesBetweenScopes,consecutiveBlankLines
 --enable consecutiveSpaces,duplicateImports,emptyBraces
 --enable hoistPatternLet,indent,enumNamespaces,leadingDelimiters,linebreakAtEndOfFile,linebreaks
---enable markTypes, modifierOrder, redundantBreak, redundantExtensionACL, redundantFileprivate, redundantGet
+--enable modifierOrder, redundantBreak, redundantExtensionACL, redundantFileprivate, redundantGet
 --enable redundantInit, redundantLet, redundantLetError, redundantNilInit, redundantObjc, redundantParens
 --enable redundantPattern,redundantRawValues, redundantReturn, redundantSelf, redundantType, redundantVoidReturnType
 --enable semicolons, sortedImports,spaceAroundBraces,spaceAroundBrackets, spaceAroundComments,spaceAroundGenerics,spaceAroundOperators
@@ -24,7 +24,6 @@
 --tabwidth 4
 --indentcase false
 --linebreaks lf
---groupedextension "MARK: - %c"
 --selfrequired
 --redundanttype inferred
 --semicolons inline

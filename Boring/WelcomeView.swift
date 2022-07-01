@@ -8,21 +8,17 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - WelcomeState
-
 struct WelcomeState: Equatable {
 	var isSpammingOn = false
 	var categorySelection: CategorySelectionState?
 }
 
-// MARK: - WelcomeAction
-
 enum WelcomeAction: Equatable {
 	case letsGoPressed
 	case spammingToggled
+	case backButtonTapped
+	case categorySelection(CategorySelectionAction)
 }
-
-// MARK: - WelcomeEnvironment
 
 struct WelcomeEnvironment {
 	var uuid: () -> UUID
@@ -37,10 +33,13 @@ let welcomeReducer = Reducer<WelcomeState, WelcomeAction, WelcomeEnvironment> { 
 	case .spammingToggled:
 		state.isSpammingOn.toggle()
 		return .none
+	case .backButtonTapped:
+		state.categorySelection = nil
+		return .none
+	case .categorySelection:
+		return .none
 	}
 }
-
-// MARK: - WelcomeView
 
 struct WelcomeView: View {
 
@@ -48,55 +47,67 @@ struct WelcomeView: View {
 
 	var body: some View {
 		WithViewStore(store) { viewStore in
-			ZStack {
-				Color("BRCream")
-					.ignoresSafeArea(.all, edges: .all)
+			NavigationView {
+				ZStack {
+					Color("BRCream")
+						.ignoresSafeArea(.all, edges: .all)
 
-				VStack {
-					Image("logo")
-						.resizable()
-						.scaledToFit()
-						.padding(.top, 70)
+					VStack {
+						Image("logo")
+							.resizable()
+							.scaledToFit()
+							.padding(.top, 70)
 
-					Text("Don’t think. We’ll just tell\n you what to do!")
-						.multilineTextAlignment(.center)
-						.font(.custom("Roboto-Black", size: 20))
-						.foregroundColor(.BRPrimaryText)
-						.padding(.vertical, 40)
+						Text("Don’t think. We’ll just tell\n you what to do!")
+							.multilineTextAlignment(.center)
+							.font(.roboto.extraBold(20))
+							.foregroundColor(.BRPrimaryText)
+							.padding(.vertical, 40)
 
-					Spacer()
+						Spacer()
 
-					CheckBoxView(
-						text: "Spam me stuff to do!",
-						checked: viewStore.binding(
-							get: \.isSpammingOn,
-							send: .spammingToggled
+						CheckBoxView(
+							text: "Spam me stuff to do!",
+							checked: viewStore.binding(
+								get: \.isSpammingOn,
+								send: .spammingToggled
+							)
 						)
-					)
-					.padding(.bottom, 38)
+						.padding(.bottom, 38)
 
-					Button(action: {}) {
-						Text("Let's Go!")
-							.font(.system(.title3, design: .rounded))
-							.fontWeight(.bold)
-							.padding(.horizontal, 81)
+						Button(action: { viewStore.send(.letsGoPressed) }) {
+							Text("Let's Go!")
+								.font(.system(.title3, design: .rounded))
+								.fontWeight(.bold)
+								.padding(.horizontal, 81)
+						}
+						.buttonStyle(.borderedProminent)
+						.buttonBorderShape(.roundedRectangle(radius: 20))
+						.tint(Color("BRGreen"))
+						.controlSize(.large)
+						.shadow(color: .black.opacity(0.2), radius: 22, x: 0, y: 7)
+
+						Spacer()
+
+						NavigationLink(
+							destination: IfLetStore(
+								store.scope(state: \.categorySelection, action: WelcomeAction.categorySelection),
+								then: CategorySelectionView.init(store:)
+							),
+							isActive: viewStore.binding(
+								get: { $0.categorySelection != nil },
+								send: { $0 ? .letsGoPressed : .backButtonTapped }
+							)
+						) {
+							EmptyView()
+						}
 					}
-					.buttonStyle(.borderedProminent)
-					.buttonBorderShape(.roundedRectangle(radius: 20))
-					.tint(Color("BRGreen"))
-					.controlSize(.large)
-					.shadow(color: .black.opacity(0.2), radius: 22, x: 0, y: 7)
-
-					Spacer()
+					.padding(.all, 30)
 				}
-				.padding(.all, 30)
-
 			}
 		}
 	}
 }
-
-// MARK: - WelcomeView_Previews
 
 struct WelcomeView_Previews: PreviewProvider {
 	static var previews: some View {

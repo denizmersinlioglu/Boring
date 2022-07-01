@@ -8,8 +8,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - AppAction
-
 enum AppAction: Equatable {
 	case appDelegate(AppDelegateAction)
 	case welcome(WelcomeAction)
@@ -19,13 +17,9 @@ enum AppAction: Equatable {
 	}
 }
 
-// MARK: - AppState
-
 enum AppState: Equatable {
 	case welcome(WelcomeState)
 }
-
-// MARK: - AppEnvironment
 
 struct AppEnvironment {
 	var uuid: () -> UUID
@@ -58,8 +52,6 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 	}
 )
 
-// MARK: - AppDelegate
-
 final class AppDelegate: NSObject, UIApplicationDelegate {
 	let store = Store(
 		initialState: .welcome(.init()),
@@ -80,8 +72,6 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 		return true
 	}
 }
-
-// MARK: - AppView
 
 struct AppView: View {
 
