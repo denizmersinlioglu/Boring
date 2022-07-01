@@ -10,14 +10,14 @@ import SwiftUI
 
 struct WelcomeState: Equatable {
 	var isSpammingOn = false
-	var categorySelection: CategorySelectionState?
+	var category: CategoryState?
 }
 
 enum WelcomeAction: Equatable {
 	case letsGoPressed
 	case spammingToggled
 	case backButtonTapped
-	case categorySelection(CategorySelectionAction)
+	case category(CategoryAction)
 }
 
 struct WelcomeEnvironment {
@@ -25,86 +25,80 @@ struct WelcomeEnvironment {
 	var mainQueue: AnySchedulerOf<DispatchQueue>
 }
 
-let welcomeReducer = Reducer<WelcomeState, WelcomeAction, WelcomeEnvironment> { state, action, environment in
-	switch action {
-	case .letsGoPressed:
-		state.categorySelection = CategorySelectionState()
-		return .none
-	case .spammingToggled:
-		state.isSpammingOn.toggle()
-		return .none
-	case .backButtonTapped:
-		state.categorySelection = nil
-		return .none
-	case .categorySelection:
-		return .none
+let welcomeReducer: Reducer<WelcomeState, WelcomeAction, WelcomeEnvironment> = .combine(
+	categoryReducer.optional().pullback(
+		state: \WelcomeState.category,
+		action: /WelcomeAction.category,
+		environment: { CategoryEnvironment(uuid: $0.uuid, mainQueue: $0.mainQueue) }
+	),
+	.init { state, action, environment in
+		switch action {
+		case .letsGoPressed:
+			state.category = CategoryState()
+			return .none
+		case .spammingToggled:
+			state.isSpammingOn.toggle()
+			return .none
+		case .backButtonTapped:
+			state.category = nil
+			return .none
+		case .category:
+			return .none
+		}
 	}
-}
+)
 
 struct WelcomeView: View {
-
 	let store: Store<WelcomeState, WelcomeAction>
 
 	var body: some View {
 		WithViewStore(store) { viewStore in
-			NavigationView {
-				ZStack {
-					Color("BRCream")
-						.ignoresSafeArea(.all, edges: .all)
+			ZStack {
+				Color("BRCream")
+					.ignoresSafeArea(.all, edges: .all)
 
-					VStack {
-						Image("logo")
-							.resizable()
-							.scaledToFit()
-							.padding(.top, 70)
+				VStack {
+					Image("logo")
+						.resizable()
+						.scaledToFit()
 
-						Text("Don’t think. We’ll just tell\n you what to do!")
-							.multilineTextAlignment(.center)
-							.font(.roboto.extraBold(20))
-							.foregroundColor(.BRPrimaryText)
-							.padding(.vertical, 40)
+					Text("Don’t think. We’ll just tell\n you what to do!")
+						.multilineTextAlignment(.center)
+						.font(.roboto.extraBold(20))
+						.foregroundColor(.BRPrimaryText)
+						.padding(.vertical, 40)
 
-						Spacer()
+					Spacer()
 
-						CheckBoxView(
-							text: "Spam me stuff to do!",
-							checked: viewStore.binding(
-								get: \.isSpammingOn,
-								send: .spammingToggled
-							)
+					CheckBoxView(
+						text: "Spam me stuff to do!",
+						checked: viewStore.binding(
+							get: \.isSpammingOn,
+							send: .spammingToggled
 						)
-						.padding(.bottom, 38)
+					)
+					.padding(.bottom, 38)
 
-						Button(action: { viewStore.send(.letsGoPressed) }) {
-							Text("Let's Go!")
-								.font(.system(.title3, design: .rounded))
-								.fontWeight(.bold)
-								.padding(.horizontal, 81)
-						}
-						.buttonStyle(.borderedProminent)
-						.buttonBorderShape(.roundedRectangle(radius: 20))
-						.tint(Color("BRGreen"))
-						.controlSize(.large)
-						.shadow(color: .black.opacity(0.2), radius: 22, x: 0, y: 7)
-
-						Spacer()
-
-						NavigationLink(
-							destination: IfLetStore(
-								store.scope(state: \.categorySelection, action: WelcomeAction.categorySelection),
-								then: CategorySelectionView.init(store:)
-							),
-							isActive: viewStore.binding(
-								get: { $0.categorySelection != nil },
-								send: { $0 ? .letsGoPressed : .backButtonTapped }
-							)
-						) {
-							EmptyView()
-						}
+					Button(action: { viewStore.send(.letsGoPressed) }) {
+						Text("Let's Go!")
+							.font(.system(.title3, design: .rounded))
+							.fontWeight(.bold)
+							.padding(.horizontal, 81)
 					}
-					.padding(.all, 30)
+					.buttonStyle(.borderedProminent)
+					.buttonBorderShape(.roundedRectangle(radius: 20))
+					.tint(.BRGreen)
+					.controlSize(.large)
+					.shadow(color: .black.opacity(0.2), radius: 22, x: 0, y: 7)
+
+					Spacer()
 				}
-			}
+				.padding(.all, 30)
+			}.navigate(
+				using: store.scope(state: \.category, action: WelcomeAction.category),
+				destination: CategoryView.init(store:),
+				onDismiss: { ViewStore(store.stateless).send(.backButtonTapped) }
+			)
 		}
 	}
 }

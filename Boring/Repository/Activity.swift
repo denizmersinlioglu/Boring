@@ -8,10 +8,7 @@
 import Foundation
 
 struct Activity: Equatable {
-	var key: String
 	var title: String
-	var price: Float
 	var participants: Int
 	var category: Category
-	var accessibility: Float
 }

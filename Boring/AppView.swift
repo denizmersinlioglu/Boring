@@ -51,6 +51,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 		}
 	}
 )
+.debug()
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
 	let store = Store(
@@ -80,7 +81,10 @@ struct AppView: View {
 	var body: some View {
 		SwitchStore(store) {
 			CaseLet(state: /AppState.welcome, action: AppAction.welcome) { welcomeStore in
-				WelcomeView(store: welcomeStore)
+				NavigationView {
+					WelcomeView(store: welcomeStore)
+				}
+				.navigationViewStyle(StackNavigationViewStyle())
 			}
 		}
 	}
