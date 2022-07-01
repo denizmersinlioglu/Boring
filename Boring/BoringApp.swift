@@ -16,7 +16,10 @@ struct BoringApp: App {
 				store: .init(
 					initialState: .welcome(.init()),
 					reducer: appReducer,
-					environment: .live
+					environment: .init(
+						mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
+						apiClient: ApiClient.live
+					)
 				)
 			)
 		}

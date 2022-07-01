@@ -13,6 +13,7 @@
 --enable spaceAroundParens, spaceInsideBraces, spaceInsideBrackets, spaceInsideComments,spaceInsideGenerics,spaceInsideParens
 --enable todos, trailingClosures,trailingCommas,trailingSpace, typeSugar, void, wrap, wrapArguments
 --enable wrapEnumCases, wrapMultilineStatementBraces, yodaConditions
+--exclude ./BoringTests/Mocks/Mock.generated
 
 # format options
 --commas inline

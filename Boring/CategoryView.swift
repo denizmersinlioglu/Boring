@@ -20,7 +20,7 @@ enum CategoryAction: Equatable {
 
 struct CategoryEnvironment {
 	var mainQueue: AnySchedulerOf<DispatchQueue>
-	var apiClient: ApiClient
+	var apiClient: ApiClientProtocol
 }
 
 let categoryReducer = Reducer<CategoryState, CategoryAction, CategoryEnvironment>.combine(
@@ -35,9 +35,10 @@ let categoryReducer = Reducer<CategoryState, CategoryAction, CategoryEnvironment
 			state.activity = ActivityState(category: category)
 			return .none
 		case let .activity(activityAction):
-			if activityAction == .restartButtonPressed { state.activity = nil }
+			if activityAction == .restartButtonTapped { state.activity = nil }
 			return .none
 		case .backButtonTapped:
+			state.activity = nil
 			return .none
 		}
 	}

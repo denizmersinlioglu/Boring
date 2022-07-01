@@ -14,7 +14,7 @@ struct WelcomeState: Equatable {
 }
 
 enum WelcomeAction: Equatable {
-	case letsGoPressed
+	case letsGoTapped
 	case spammingToggled
 	case backButtonTapped
 	case category(CategoryAction)
@@ -22,7 +22,7 @@ enum WelcomeAction: Equatable {
 
 struct WelcomeEnvironment {
 	var mainQueue: AnySchedulerOf<DispatchQueue>
-	var apiClient: ApiClient
+	var apiClient: ApiClientProtocol
 }
 
 let welcomeReducer: Reducer<WelcomeState, WelcomeAction, WelcomeEnvironment> = .combine(
@@ -33,7 +33,7 @@ let welcomeReducer: Reducer<WelcomeState, WelcomeAction, WelcomeEnvironment> = .
 	),
 	.init { state, action, environment in
 		switch action {
-		case .letsGoPressed:
+		case .letsGoTapped:
 			state.category = CategoryState()
 			return .none
 		case .spammingToggled:
@@ -79,7 +79,7 @@ struct WelcomeView: View {
 					)
 					.padding(.bottom, 38)
 
-					Button(action: { viewStore.send(.letsGoPressed) }) {
+					Button(action: { viewStore.send(.letsGoTapped) }) {
 						Text("Let's Go!")
 							.font(.system(.title3, design: .rounded))
 							.fontWeight(.bold)

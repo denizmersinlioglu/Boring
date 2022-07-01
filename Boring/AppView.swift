@@ -23,16 +23,7 @@ enum AppState: Equatable {
 
 struct AppEnvironment {
 	var mainQueue: AnySchedulerOf<DispatchQueue>
-	var apiClient: ApiClient
-}
-
-extension AppEnvironment {
-	static var live: Self {
-		.init(
-			mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
-			apiClient: ApiClient.live
-		)
-	}
+	var apiClient: ApiClientProtocol
 }
 
 let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
@@ -57,7 +48,10 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 	let store = Store(
 		initialState: .welcome(.init()),
 		reducer: appReducer,
-		environment: .live
+		environment: .init(
+			mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
+			apiClient: ApiClient.live
+		)
 	)
 
 	lazy var viewStore = ViewStore(

@@ -1,0 +1,13 @@
+sourceryCommand: mint run sourcery
+sourceryTemplate: null
+.mocky:
+  sources:
+    include:
+      - ./Boring
+  output: ./BoringTests/Mocks/Mock.generated.swift
+  testable:
+    - Boring
+  import:
+    - SwiftyJSON
+    - Combine
+    - Foundation

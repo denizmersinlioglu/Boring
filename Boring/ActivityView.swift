@@ -16,13 +16,13 @@ struct ActivityState: Equatable {
 enum ActivityAction: Equatable {
 	case fetchActivity
 	case activityResponse(Result<Activity, Failure>)
-	case restartButtonPressed
-	case reloadButtonPressed
+	case restartButtonTapped
+	case reloadButtonTapped
 }
 
 struct ActivityEnvironment {
 	var mainQueue: AnySchedulerOf<DispatchQueue>
-	var apiClient: ApiClient
+	var apiClient: ApiClientProtocol
 }
 
 let activityReducer: Reducer<ActivityState, ActivityAction, ActivityEnvironment> = .init { state, action, environment in
@@ -45,11 +45,11 @@ let activityReducer: Reducer<ActivityState, ActivityAction, ActivityEnvironment>
 	case let .activityResponse(.failure(error)):
 		return .none
 
-	case .reloadButtonPressed:
+	case .reloadButtonTapped:
 		state.activity = nil
 		return Effect(value: .fetchActivity)
 
-	case .restartButtonPressed:
+	case .restartButtonTapped:
 		return .none
 	}
 }
@@ -73,13 +73,13 @@ struct ActivityView: View {
 							.padding(.bottom, 21)
 
 						ActivityCard(activity: viewStore.activity, category: viewStore.category) {
-							viewStore.send(.reloadButtonPressed)
+							viewStore.send(.reloadButtonTapped)
 						}
 					}
 
 					Spacer()
 
-					Button(action: { viewStore.send(.restartButtonPressed) }) {
+					Button(action: { viewStore.send(.restartButtonTapped) }) {
 						Text("Restart")
 							.font(.system(.title3, design: .rounded))
 							.fontWeight(.bold)
