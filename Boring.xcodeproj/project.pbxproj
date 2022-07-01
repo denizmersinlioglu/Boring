@@ -46,6 +46,10 @@
 		227C02E1286F03990094C57D /* CheckBoxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 227C02E0286F03990094C57D /* CheckBoxView.swift */; };
 		229E0119286F275C00EEBBC7 /* ActivityCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229E0118286F275C00EEBBC7 /* ActivityCard.swift */; };
 		22E41436286F2F1F001E6B62 /* NavigationLink+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E41435286F2F1F001E6B62 /* NavigationLink+Extensions.swift */; };
+		22E41439286F3377001E6B62 /* ApiClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E41438286F3377001E6B62 /* ApiClient.swift */; };
+		22E4143E286F3425001E6B62 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E4143D286F3425001E6B62 /* Config.swift */; };
+		22E41440286F3ED7001E6B62 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E4143F286F3ED7001E6B62 /* Logger.swift */; };
+		22E41442286F3F00001E6B62 /* JSONParsable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22E41441286F3F00001E6B62 /* JSONParsable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +96,10 @@
 		227C02E0286F03990094C57D /* CheckBoxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBoxView.swift; sourceTree = "<group>"; };
 		229E0118286F275C00EEBBC7 /* ActivityCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCard.swift; sourceTree = "<group>"; };
 		22E41435286F2F1F001E6B62 /* NavigationLink+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NavigationLink+Extensions.swift"; sourceTree = "<group>"; };
+		22E41438286F3377001E6B62 /* ApiClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiClient.swift; sourceTree = "<group>"; };
+		22E4143D286F3425001E6B62 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		22E4143F286F3ED7001E6B62 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		22E41441286F3F00001E6B62 /* JSONParsable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONParsable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -198,6 +206,8 @@
 			isa = PBXGroup;
 			children = (
 				227C02A5286EF2930094C57D /* Extensions */,
+				22E4143F286F3ED7001E6B62 /* Logger.swift */,
+				22E41441286F3F00001E6B62 /* JSONParsable.swift */,
 			);
 			path = SupportingFiles;
 			sourceTree = "<group>";
@@ -215,8 +225,11 @@
 		227C02A8286EF4110094C57D /* Repository */ = {
 			isa = PBXGroup;
 			children = (
+				22E41437286F336F001E6B62 /* Entities */,
 				227C02A9286EF41E0094C57D /* Category.swift */,
 				227C02AB286EF59F0094C57D /* Activity.swift */,
+				22E41438286F3377001E6B62 /* ApiClient.swift */,
+				22E4143D286F3425001E6B62 /* Config.swift */,
 			);
 			path = Repository;
 			sourceTree = "<group>";
@@ -239,6 +252,13 @@
 				227C02E0286F03990094C57D /* CheckBoxView.swift */,
 			);
 			path = Common;
+			sourceTree = "<group>";
+		};
+		22E41437286F336F001E6B62 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Entities;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -428,13 +448,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				227C02DE286EFE660094C57D /* AppView.swift in Sources */,
+				22E41442286F3F00001E6B62 /* JSONParsable.swift in Sources */,
 				227C02E1286F03990094C57D /* CheckBoxView.swift in Sources */,
 				227C02A7286EF29F0094C57D /* Color+Extension.swift in Sources */,
+				22E4143E286F3425001E6B62 /* Config.swift in Sources */,
 				227C02A0286EF0CE0094C57D /* CategoryView.swift in Sources */,
 				227C02AC286EF59F0094C57D /* Activity.swift in Sources */,
 				227C029E286EF0BE0094C57D /* WelcomeView.swift in Sources */,
 				227C02DC286EF9F30094C57D /* Font+Extensions.swift in Sources */,
 				227C0271286EEF180094C57D /* BoringApp.swift in Sources */,
+				22E41439286F3377001E6B62 /* ApiClient.swift in Sources */,
+				22E41440286F3ED7001E6B62 /* Logger.swift in Sources */,
 				227C02A2286EF0DE0094C57D /* ActivityView.swift in Sources */,
 				229E0119286F275C00EEBBC7 /* ActivityCard.swift in Sources */,
 				227C02AA286EF41E0094C57D /* Category.swift in Sources */,

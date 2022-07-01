@@ -19,22 +19,29 @@ enum CategoryAction: Equatable {
 }
 
 struct CategoryEnvironment {
-	var uuid: () -> UUID
 	var mainQueue: AnySchedulerOf<DispatchQueue>
+	var apiClient: ApiClient
 }
 
-let categoryReducer: Reducer<CategoryState, CategoryAction, CategoryEnvironment> = .init { state, action, environment in
-	switch action {
-	case let .categorySelected(category):
-		state.activity = ActivityState(category: category)
-		return .none
-	case let .activity(activityAction):
-		if activityAction == .restartButtonPressed { state.activity = nil }
-		return .none
-	case .backButtonTapped:
-		return .none
+let categoryReducer = Reducer<CategoryState, CategoryAction, CategoryEnvironment>.combine(
+	activityReducer.optional().pullback(
+		state: \.activity,
+		action: /CategoryAction.activity,
+		environment: { .init(mainQueue: $0.mainQueue, apiClient: $0.apiClient) }
+	),
+	.init { state, action, environment in
+		switch action {
+		case let .categorySelected(category):
+			state.activity = ActivityState(category: category)
+			return .none
+		case let .activity(activityAction):
+			if activityAction == .restartButtonPressed { state.activity = nil }
+			return .none
+		case .backButtonTapped:
+			return .none
+		}
 	}
-}
+)
 
 struct CategoryView: View {
 	let store: Store<CategoryState, CategoryAction>
@@ -100,8 +107,8 @@ struct CategoryView_Previews: PreviewProvider {
 				initialState: .init(),
 				reducer: categoryReducer,
 				environment: CategoryEnvironment(
-					uuid: UUID.init,
-					mainQueue: DispatchQueue.main.eraseToAnyScheduler()
+					mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
+					apiClient: ApiClient.noop
 				)
 			)
 		)

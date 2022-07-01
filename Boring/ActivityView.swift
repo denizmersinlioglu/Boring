@@ -14,19 +14,41 @@ struct ActivityState: Equatable {
 }
 
 enum ActivityAction: Equatable {
+	case fetchActivity
+	case activityResponse(Result<Activity, Failure>)
 	case restartButtonPressed
 	case reloadButtonPressed
 }
 
 struct ActivityEnvironment {
-	var uuid: () -> UUID
 	var mainQueue: AnySchedulerOf<DispatchQueue>
+	var apiClient: ApiClient
 }
 
 let activityReducer: Reducer<ActivityState, ActivityAction, ActivityEnvironment> = .init { state, action, environment in
 	switch action {
-	case .reloadButtonPressed:
+	case .fetchActivity:
+		enum ActivitySearchId {}
+		return environment.apiClient.request(
+			ApiClient.Target.getActivity(category: state.category),
+			as: Activity.self
+		)
+		.receive(on: environment.mainQueue)
+		.catchToEffect()
+		.map { .activityResponse($0) }
+		.cancellable(id: ActivitySearchId.self, cancelInFlight: true)
+
+	case let .activityResponse(.success(activity)):
+		state.activity = activity
 		return .none
+
+	case let .activityResponse(.failure(error)):
+		return .none
+
+	case .reloadButtonPressed:
+		state.activity = nil
+		return Effect(value: .fetchActivity)
+
 	case .restartButtonPressed:
 		return .none
 	}
@@ -75,6 +97,7 @@ struct ActivityView: View {
 				.padding(.horizontal, 30)
 			}
 			.navigationBarHidden(true)
+			.onAppear { viewStore.send(.fetchActivity) }
 		}
 	}
 }
@@ -85,8 +108,8 @@ struct ActivityView_Previews: PreviewProvider {
 			initialState: .init(category: .social),
 			reducer: activityReducer,
 			environment: ActivityEnvironment(
-				uuid: UUID.init,
-				mainQueue: DispatchQueue.main.eraseToAnyScheduler()
+				mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
+				apiClient: ApiClient.noop
 			)
 		))
 	}

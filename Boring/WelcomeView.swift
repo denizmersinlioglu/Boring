@@ -21,15 +21,15 @@ enum WelcomeAction: Equatable {
 }
 
 struct WelcomeEnvironment {
-	var uuid: () -> UUID
 	var mainQueue: AnySchedulerOf<DispatchQueue>
+	var apiClient: ApiClient
 }
 
 let welcomeReducer: Reducer<WelcomeState, WelcomeAction, WelcomeEnvironment> = .combine(
 	categoryReducer.optional().pullback(
 		state: \WelcomeState.category,
 		action: /WelcomeAction.category,
-		environment: { CategoryEnvironment(uuid: $0.uuid, mainQueue: $0.mainQueue) }
+		environment: { .init(mainQueue: $0.mainQueue, apiClient: $0.apiClient) }
 	),
 	.init { state, action, environment in
 		switch action {
@@ -110,8 +110,8 @@ struct WelcomeView_Previews: PreviewProvider {
 				initialState: WelcomeState(),
 				reducer: welcomeReducer,
 				environment: WelcomeEnvironment(
-					uuid: UUID.init,
-					mainQueue: DispatchQueue.main.eraseToAnyScheduler()
+					mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
+					apiClient: ApiClient.noop
 				)
 			)
 		)

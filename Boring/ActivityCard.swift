@@ -35,6 +35,7 @@ struct ActivityCard: View {
 							Text(activity.title.uppercased())
 								.foregroundColor(.white)
 								.font(.roboto.bold(36))
+								.multilineTextAlignment(.center)
 
 							Spacer()
 

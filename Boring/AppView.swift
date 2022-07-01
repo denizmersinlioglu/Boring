@@ -22,15 +22,15 @@ enum AppState: Equatable {
 }
 
 struct AppEnvironment {
-	var uuid: () -> UUID
 	var mainQueue: AnySchedulerOf<DispatchQueue>
+	var apiClient: ApiClient
 }
 
 extension AppEnvironment {
 	static var live: Self {
 		.init(
-			uuid: UUID.init,
-			mainQueue: DispatchQueue.main.eraseToAnyScheduler()
+			mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
+			apiClient: ApiClient.live
 		)
 	}
 }
@@ -39,7 +39,7 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 	welcomeReducer.pullback(
 		state: /AppState.welcome,
 		action: /AppAction.welcome,
-		environment: { WelcomeEnvironment(uuid: $0.uuid, mainQueue: $0.mainQueue) }
+		environment: { .init(mainQueue: $0.mainQueue, apiClient: $0.apiClient) }
 	),
 	.init { state, action, environment in
 		switch action {
