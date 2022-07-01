@@ -19,7 +19,6 @@ struct BoringApp: App {
 					environment: .live
 				)
 			)
-			.onAppear()
 		}
 	}
 }
