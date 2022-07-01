@@ -5,13 +5,23 @@
 //  Created by Deniz Mersinlioğlu on 1.07.2022.
 //
 
-import Foundation
+import SwiftyJSON
 
-struct Activity: Equatable {
-	var key: String
+struct Activity: Equatable, JSONParsable {
 	var title: String
-	var price: Float
 	var participants: Int
 	var category: Category
-	var accessibility: Float
+
+	init(title: String, participants: Int, category: Category) {
+		self.title = title
+		self.participants = participants
+		self.category = category
+	}
+
+	init?(_ json: JSON) {
+		if json["key"].string == nil { return nil }
+		title = json["activity"].stringValue
+		participants = json["participants"].intValue
+		category = Category(rawValue: json["type"].stringValue) ?? .social
+	}
 }

@@ -45,7 +45,7 @@ extension Font {
 				.weight(.medium)
 		}
 
-		func black(_ size: CGFloat) -> Font {
+		func extraBold(_ size: CGFloat) -> Font {
 			Font
 				.custom(black, size: size)
 				.weight(.heavy)

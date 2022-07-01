@@ -8,8 +8,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - AppAction
-
 enum AppAction: Equatable {
 	case appDelegate(AppDelegateAction)
 	case welcome(WelcomeAction)
@@ -19,33 +17,20 @@ enum AppAction: Equatable {
 	}
 }
 
-// MARK: - AppState
-
 enum AppState: Equatable {
 	case welcome(WelcomeState)
 }
 
-// MARK: - AppEnvironment
-
 struct AppEnvironment {
-	var uuid: () -> UUID
 	var mainQueue: AnySchedulerOf<DispatchQueue>
-}
-
-extension AppEnvironment {
-	static var live: Self {
-		.init(
-			uuid: UUID.init,
-			mainQueue: DispatchQueue.main.eraseToAnyScheduler()
-		)
-	}
+	var apiClient: ApiClientProtocol
 }
 
 let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 	welcomeReducer.pullback(
 		state: /AppState.welcome,
 		action: /AppAction.welcome,
-		environment: { WelcomeEnvironment(uuid: $0.uuid, mainQueue: $0.mainQueue) }
+		environment: { .init(mainQueue: $0.mainQueue, apiClient: $0.apiClient) }
 	),
 	.init { state, action, environment in
 		switch action {
@@ -57,14 +42,16 @@ let appReducer = Reducer<AppState, AppAction, AppEnvironment>.combine(
 		}
 	}
 )
-
-// MARK: - AppDelegate
+.debug()
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
 	let store = Store(
 		initialState: .welcome(.init()),
 		reducer: appReducer,
-		environment: .live
+		environment: .init(
+			mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
+			apiClient: ApiClient.live
+		)
 	)
 
 	lazy var viewStore = ViewStore(
@@ -81,8 +68,6 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
 	}
 }
 
-// MARK: - AppView
-
 struct AppView: View {
 
 	let store: Store<AppState, AppAction>
@@ -90,7 +75,10 @@ struct AppView: View {
 	var body: some View {
 		SwitchStore(store) {
 			CaseLet(state: /AppState.welcome, action: AppAction.welcome) { welcomeStore in
-				WelcomeView(store: welcomeStore)
+				NavigationView {
+					WelcomeView(store: welcomeStore)
+				}
+				.navigationViewStyle(StackNavigationViewStyle())
 			}
 		}
 	}

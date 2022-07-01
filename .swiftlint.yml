@@ -200,7 +200,9 @@ opt_in_rules:
   - yoda_condition # The variable should be placed on the left, the constant on the right of a comparison operator.
 included:
   - Boring
-# excluded: # paths to ignore during linting. Takes precedence over `included`.
+  - BoringTests
+excluded:
+  - BoringTests/Mocks/Mock.generated
 type_body_length:
   - 300 # warning
   - 300 # error
@@ -208,8 +210,8 @@ file_length:
   warning: 1000
   error: 2000
 closure_body_length:
-  warning: 35
-  error: 35
+  warning: 100
+  error: 100
 cyclomatic_complexity:
   warning: 15
   error: 15

@@ -8,42 +8,47 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - WelcomeState
-
 struct WelcomeState: Equatable {
 	var isSpammingOn = false
-	var categorySelection: CategorySelectionState?
+	var category: CategoryState?
 }
-
-// MARK: - WelcomeAction
 
 enum WelcomeAction: Equatable {
-	case letsGoPressed
+	case letsGoTapped
 	case spammingToggled
+	case backButtonTapped
+	case category(CategoryAction)
 }
-
-// MARK: - WelcomeEnvironment
 
 struct WelcomeEnvironment {
-	var uuid: () -> UUID
 	var mainQueue: AnySchedulerOf<DispatchQueue>
+	var apiClient: ApiClientProtocol
 }
 
-let welcomeReducer = Reducer<WelcomeState, WelcomeAction, WelcomeEnvironment> { state, action, environment in
-	switch action {
-	case .letsGoPressed:
-		state.categorySelection = CategorySelectionState()
-		return .none
-	case .spammingToggled:
-		state.isSpammingOn.toggle()
-		return .none
+let welcomeReducer: Reducer<WelcomeState, WelcomeAction, WelcomeEnvironment> = .combine(
+	categoryReducer.optional().pullback(
+		state: \WelcomeState.category,
+		action: /WelcomeAction.category,
+		environment: { .init(mainQueue: $0.mainQueue, apiClient: $0.apiClient) }
+	),
+	.init { state, action, environment in
+		switch action {
+		case .letsGoTapped:
+			state.category = CategoryState()
+			return .none
+		case .spammingToggled:
+			state.isSpammingOn.toggle()
+			return .none
+		case .backButtonTapped:
+			state.category = nil
+			return .none
+		case .category:
+			return .none
+		}
 	}
-}
-
-// MARK: - WelcomeView
+)
 
 struct WelcomeView: View {
-
 	let store: Store<WelcomeState, WelcomeAction>
 
 	var body: some View {
@@ -56,11 +61,10 @@ struct WelcomeView: View {
 					Image("logo")
 						.resizable()
 						.scaledToFit()
-						.padding(.top, 70)
 
 					Text("Don’t think. We’ll just tell\n you what to do!")
 						.multilineTextAlignment(.center)
-						.font(.custom("Roboto-Black", size: 20))
+						.font(.roboto.extraBold(20))
 						.foregroundColor(.BRPrimaryText)
 						.padding(.vertical, 40)
 
@@ -75,7 +79,7 @@ struct WelcomeView: View {
 					)
 					.padding(.bottom, 38)
 
-					Button(action: {}) {
+					Button(action: { viewStore.send(.letsGoTapped) }) {
 						Text("Let's Go!")
 							.font(.system(.title3, design: .rounded))
 							.fontWeight(.bold)
@@ -83,20 +87,21 @@ struct WelcomeView: View {
 					}
 					.buttonStyle(.borderedProminent)
 					.buttonBorderShape(.roundedRectangle(radius: 20))
-					.tint(Color("BRGreen"))
+					.tint(.BRGreen)
 					.controlSize(.large)
 					.shadow(color: .black.opacity(0.2), radius: 22, x: 0, y: 7)
 
 					Spacer()
 				}
 				.padding(.all, 30)
-
-			}
+			}.navigate(
+				using: store.scope(state: \.category, action: WelcomeAction.category),
+				destination: CategoryView.init(store:),
+				onDismiss: { ViewStore(store.stateless).send(.backButtonTapped) }
+			)
 		}
 	}
 }
-
-// MARK: - WelcomeView_Previews
 
 struct WelcomeView_Previews: PreviewProvider {
 	static var previews: some View {
@@ -105,8 +110,8 @@ struct WelcomeView_Previews: PreviewProvider {
 				initialState: WelcomeState(),
 				reducer: welcomeReducer,
 				environment: WelcomeEnvironment(
-					uuid: UUID.init,
-					mainQueue: DispatchQueue.main.eraseToAnyScheduler()
+					mainQueue: DispatchQueue.main.eraseToAnyScheduler(),
+					apiClient: ApiClient.noop
 				)
 			)
 		)

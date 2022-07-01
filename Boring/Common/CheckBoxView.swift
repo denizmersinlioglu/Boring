@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-// MARK: - CheckBoxView
-
 struct CheckBoxView: View {
 
 	var text: String
@@ -24,8 +22,6 @@ struct CheckBoxView: View {
 		.onTapGesture { checked.toggle() }
 	}
 }
-
-// MARK: - CheckBoxView_Previews
 
 struct CheckBoxView_Previews: PreviewProvider {
 
